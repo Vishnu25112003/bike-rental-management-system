@@ -152,15 +152,6 @@ function SignUp() {
               Sign Up
             </button>
           </div>
-
-          <div className="text-center mb-4">
-            <span className="text-lg font-semibold">(OR)</span>
-          </div>
-
-          <button className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-300 shadow-md hover:shadow-lg">
-            <img alt="Google logo" className="mr-3 h-5 w-5" src={google} />
-            <span>Continue with Google</span>
-          </button>
         </form>
 
         <div className="text-center mt-4">

@@ -1,4 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  Bike,
+  Save,
+  X,
+  Upload,
+  Eye,
+  Package,
+  DollarSign
+} from "lucide-react";
 
 export default function ManageBikes() {
   const [bikes, setBikes] = useState([]);
@@ -20,8 +33,8 @@ export default function ManageBikes() {
   });
   const [editingBikeId, setEditingBikeId] = useState(null);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [loading, setLoading] = useState(false);
 
-  // Fetch all bikes on load
   useEffect(() => {
     fetch("http://localhost:5000/api/bikes")
       .then((res) => res.json())
@@ -29,7 +42,6 @@ export default function ManageBikes() {
       .catch((err) => console.error("Error fetching bikes:", err));
   }, []);
 
-  // Load bike data when editing
   useEffect(() => {
     if (editingBikeId && activeTab === "edit") {
       const bike = bikes.find((b) => b._id === editingBikeId);
@@ -51,7 +63,7 @@ export default function ManageBikes() {
         });
       }
     }
-  }, [editingBikeId, activeTab]);
+  }, [editingBikeId, activeTab, bikes]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -64,6 +76,8 @@ export default function ManageBikes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     const formData = new FormData();
     for (let key in bikeData) {
       formData.append(key, bikeData[key]);
@@ -72,7 +86,6 @@ export default function ManageBikes() {
     const url = editingBikeId
       ? `http://localhost:5000/api/bikes/${editingBikeId}`
       : "http://localhost:5000/api/bikes";
-
     const method = editingBikeId ? "PUT" : "POST";
 
     try {
@@ -80,7 +93,6 @@ export default function ManageBikes() {
         method,
         body: formData,
       });
-
       const result = await res.json();
 
       if (res.ok) {
@@ -103,7 +115,12 @@ export default function ManageBikes() {
       }
     } catch (err) {
       console.error("Error submitting bike:", err);
-      setMessage({ type: "error", text: "⚠️ Something went wrong." });
+      setMessage({
+        type: "error",
+        text: "⚠️ Something went wrong.",
+      });
+    } finally {
+      setLoading(false);
     }
 
     setTimeout(() => setMessage({ type: "", text: "" }), 3000);
@@ -138,12 +155,21 @@ export default function ManageBikes() {
 
       if (res.ok) {
         setBikes(bikes.filter((bike) => bike._id !== id));
-        setMessage({ type: "success", text: "✅ Bike deleted successfully!" });
+        setMessage({
+          type: "success",
+          text: "✅ Bike deleted successfully!",
+        });
       } else {
-        setMessage({ type: "error", text: "❌ Failed to delete bike." });
+        setMessage({
+          type: "error",
+          text: "❌ Failed to delete bike.",
+        });
       }
     } catch (err) {
-      setMessage({ type: "error", text: "⚠️ Error deleting bike." });
+      setMessage({
+        type: "error",
+        text: "⚠️ Error deleting bike.",
+      });
     }
 
     setTimeout(() => setMessage({ type: "", text: "" }), 3000);
@@ -156,297 +182,385 @@ export default function ManageBikes() {
 
   const getStatusStyle = (status) => {
     return status === "available"
-      ? "bg-green-100 text-green-800"
-      : "bg-red-100 text-red-800";
+      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+      : "bg-red-100 text-red-800 border-red-200";
   };
 
-  return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-gray-900">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="5.5" cy="17.5" r="3.5"/>
-            <circle cx="18.5" cy="17.5" r="3.5"/>
-            <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/>
-          </svg>
-          Manage Bikes
-        </h1>
-        <p className="text-gray-500 mt-2">Add, edit, and manage your bike inventory</p>
-      </div>
+  const tabs = [
+    { id: "inventory", label: "Inventory", icon: Package },
+    { id: "add", label: "Add Bike", icon: Plus },
+    { id: "edit", label: "Edit Bike", icon: Edit3 },
+  ];
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="flex -mb-px">
-          <button
-            onClick={() => setActiveTab("inventory")}
-            className={`py-2 px-4 text-sm font-medium border-b-2 ${
-              activeTab === "inventory"
-                ? "border-indigo-500 text-indigo-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            Inventory
-          </button>
-          <button
-            onClick={() => setActiveTab("add")}
-            className={`py-2 px-4 text-sm font-medium border-b-2 ${
-              activeTab === "add"
-                ? "border-indigo-500 text-indigo-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            Add New Bike
-          </button>
-          {editingBikeId && (
-            <button
-              onClick={() => setActiveTab("edit")}
-              className={`py-2 px-4 text-sm font-medium border-b-2 ${
-                activeTab === "edit"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-inter">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="p-6 max-w-7xl mx-auto"
+      >
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-8"
+        >
+          <h1 className="text-3xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+            <Bike className="w-8 h-8 text-blue-600" />
+            Manage Bikes
+          </h1>
+          <p className="text-slate-600 font-medium">
+            Add, edit, and manage your bike inventory
+          </p>
+        </motion.div>
+
+        {/* Message */}
+        <AnimatePresence>
+          {message.text && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              className={`mb-6 p-4 rounded-xl border ${
+                message.type === "success"
+                  ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                  : "bg-red-50 border-red-200 text-red-700"
               }`}
             >
-              Edit Bike
-            </button>
+              <p className="font-medium">{message.text}</p>
+            </motion.div>
           )}
-        </nav>
-      </div>
+        </AnimatePresence>
 
-      {/* Inventory Tab */}
-      {activeTab === "inventory" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {bikes.length > 0 ? (
-            bikes.map((bike) => (
-              <div key={bike._id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-                <div className="relative aspect-video bg-gray-100">
-                  <img
-                    src={bike.img}
-                    alt={bike.name}
-                    className="object-cover w-full h-full"
-                  />
-                  <span
-                    className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(
-                      bike.status || "available"
-                    )}`}
-                  >
-                    {bike.status?.charAt(0).toUpperCase() + bike.status?.slice(1)}
-                  </span>
-                </div>
-                <div className="p-4 pb-2">
-                  <h3 className="text-lg font-semibold">{bike.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    ₹{bike.price}/day • {bike.cc}cc
-                  </p>
-                </div>
-                <div className="px-4 pb-2">
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                    <div><span className="text-gray-500">Vendor:</span> {bike.vendorName}</div>
-                    <div><span className="text-gray-500">KM Limit:</span> {bike.kmLimit}</div>
-                    <div><span className="text-gray-500">Extra/KM:</span> ₹{bike.extraCharge}</div>
-                    <div><span className="text-gray-500">Fuel:</span> {bike.fuel}</div>
-                    <div><span className="text-gray-500">Deposit:</span> ₹{bike.deposit}</div>
-                    <div><span className="text-gray-500">Year:</span> {bike.modelYear}</div>
-                    <div><span className="text-gray-500">Mileage:</span> {bike.mileage}</div>
-                    <div><span className="text-gray-500">Quantity:</span> {bike.quantity}</div>
-                  </div>
-                </div>
-                <div className="p-4 flex gap-2">
-                  <button
-                    onClick={() => handleEdit(bike)}
-                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(bike._id)}
-                    className="flex-1 px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="col-span-full text-gray-500 text-center py-10">No bikes found.</p>
-          )}
-        </div>
-      )}
-
-      {/* Add/Edit Form Tab */}
-      {(activeTab === "add" || activeTab === "edit") && (
-        <div className="bg-white rounded-lg shadow border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold">
-              {editingBikeId ? "Edit Bike" : "Add New Bike"}
-            </h3>
-            <p className="text-sm text-gray-500">
-              Fill in the details to {editingBikeId ? "update" : "add"} a bike
-            </p>
-          </div>
-          <div className="p-6">
-            {message.text && (
-              <div
-                className={`mb-4 p-3 rounded text-sm ${
-                  message.type === "success"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+        {/* Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <div className="flex flex-wrap gap-2">
+            {tabs.map((tab) => (
+              <motion.button
+                key={tab.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (tab.id === "add") resetForm();
+                }}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                 }`}
               >
-                {message.text}
-              </div>
-            )}
-            <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input label="Bike Name" name="name" value={bikeData.name} onChange={handleChange} required />
-                <Input label="Price (₹/day)" name="price" value={bikeData.price} onChange={handleChange} required type="number" />
-                <Input label="Vendor Name" name="vendorName" value={bikeData.vendorName} onChange={handleChange} required />
-                <Input label="KM Limit" name="kmLimit" value={bikeData.kmLimit} onChange={handleChange} required />
-                <Input label="Extra Charge per KM (₹)" name="extraCharge" value={bikeData.extraCharge} onChange={handleChange} required />
-                <SelectInput label="Fuel Included" name="fuel" value={bikeData.fuel} onChange={handleChange}>
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </SelectInput>
-                <Input label="Deposit (₹)" name="deposit" value={bikeData.deposit} onChange={handleChange} required type="number" />
-                <Input label="Model Year" name="modelYear" value={bikeData.modelYear} onChange={handleChange} required />
-                <Input label="Mileage (km/l)" name="mileage" value={bikeData.mileage} onChange={handleChange} required />
-                <Input label="Engine Capacity (CC)" name="cc" value={bikeData.cc} onChange={handleChange} required />
-                <Input label="Quantity Available" name="quantity" value={bikeData.quantity} onChange={handleChange} required type="number" />
-
-                {/* Status Select */}
-                <SelectInput label="Status" name="status" value={bikeData.status} onChange={handleChange}>
-                  <option value="available">Available</option>
-                  <option value="in maintenance">In Maintenance</option>
-                </SelectInput>
-
-                {/* Image Upload Field */}
-                <div className="md:col-span-2 space-y-2">
-  <label className="block text-sm font-medium text-gray-700">Bike Image</label>
-
-  {/* Image Preview */}
-  {bikeData.img && (
-    typeof bikeData.img === "string" ? (
-      // If it's a URL from backend
-      <div className="mb-3">
-        <img
-          src={bikeData.img}
-          alt="Preview"
-          className="h-32 w-full object-cover rounded border"
-        />
-      </div>
-    ) : (
-      // If it's a new File object
-      <div className="mb-3 text-sm text-gray-500">
-        Selected file: {bikeData.img.name} ({(bikeData.img.size / 1024).toFixed(1)} KB)
-      </div>
-    )
-  )}
-
-  {/* Styled Dropzone */}
-  <div className="relative">
-    <input
-      type="file"
-      name="img"
-      accept="image/*"
-      onChange={handleChange}
-      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-      aria-label="Upload bike image"
-    />
-
-    <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-400 hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-8 h-8 mb-2 text-gray-400"
-      >
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="17 8 12 3 7 8" />
-        <line x1="12" y1="3" x2="12" y2="15" />
-      </svg>
-      <p className="text-sm text-gray-600">
-        <span className="font-semibold">Click to upload</span> or drag and drop
-      </p>
-      <p className="text-xs text-gray-500 mt-1">PNG, JPG, or WEBP (MAX 2MB)</p>
-    </div>
-  </div>
-</div>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("inventory");
-                    resetForm();
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                >
-                  {editingBikeId ? "Save Changes" : "Add Bike"}
-                </button>
-              </div>
-            </form>
+                <tab.icon className="w-5 h-5" />
+                {tab.label}
+              </motion.button>
+            ))}
           </div>
-        </div>
-      )}
+        </motion.div>
+
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          {activeTab === "inventory" && (
+            <motion.div
+              key="inventory"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {bikes.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {bikes.map((bike, index) => (
+                    <motion.div
+                      key={bike._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ scale: 1.02, y: -4 }}
+                      className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden group"
+                    >
+                      <div className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">{bike.name}</h3>
+                            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusStyle(bike.status)}`}>
+                              {bike.status === "available" ? (
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                              ) : (
+                                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                              )}
+                              {bike.status.charAt(0).toUpperCase() + bike.status.slice(1)}
+                            </div>
+                          </div>
+                          <DollarSign className="w-6 h-6 text-slate-400 group-hover:text-slate-600 transition-colors duration-200" />
+                        </div>
+
+                        <div className="space-y-2 mb-6">
+                          <p className="text-slate-600 font-medium">
+                            <span className="text-2xl font-bold text-blue-600">₹{bike.price}</span>/day
+                          </p>
+                          <p className="text-slate-600">
+                            <span className="font-semibold">{bike.cc}cc</span> • 
+                            <span className="font-semibold ml-1">{bike.mileage} kmpl</span>
+                          </p>
+                          <p className="text-slate-500 text-sm">Vendor: {bike.vendorName}</p>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleEdit(bike)}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors duration-200"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            Edit
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleDelete(bike._id)}
+                            className="flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors duration-200"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </motion.button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-16 bg-white rounded-2xl shadow-lg border border-slate-200"
+                >
+                  <Bike className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-slate-600 mb-2">No bikes found</h3>
+                  <p className="text-slate-500 font-medium mb-6">Start by adding your first bike to the inventory</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setActiveTab("add")}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Add First Bike
+                  </motion.button>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+
+          {(activeTab === "add" || activeTab === "edit") && (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8"
+            >
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                  {editingBikeId ? "Update Bike" : "Add New Bike"}
+                </h2>
+                <p className="text-slate-600 font-medium">
+                  Fill in the details to {editingBikeId ? "update" : "add"} a bike
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Form fields */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Bike Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={bikeData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Enter bike name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Price (₹/day)
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={bikeData.price}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Enter daily price"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Vendor Name
+                    </label>
+                    <input
+                      type="text"
+                      name="vendorName"
+                      value={bikeData.vendorName}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Enter vendor name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      CC
+                    </label>
+                    <input
+                      type="number"
+                      name="cc"
+                      value={bikeData.cc}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Engine CC"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Mileage (kmpl)
+                    </label>
+                    <input
+                      type="number"
+                      name="mileage"
+                      value={bikeData.mileage}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Fuel efficiency"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Model Year
+                    </label>
+                    <input
+                      type="number"
+                      name="modelYear"
+                      value={bikeData.modelYear}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Manufacturing year"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Quantity
+                    </label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={bikeData.quantity}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                      placeholder="Available quantity"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={bikeData.status}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-medium"
+                    >
+                      <option value="available">Available</option>
+                      <option value="in maintenance">In Maintenance</option>
+                      <option value="unavailable">Unavailable</option>
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Bike Image
+                    </label>
+                    <div className="flex items-center justify-center w-full">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors duration-200">
+                        <Upload className="w-8 h-8 text-slate-400 mb-2" />
+                        <p className="text-sm text-slate-500 font-medium">
+                          Click to upload bike image
+                        </p>
+                        <input
+                          type="file"
+                          name="img"
+                          onChange={handleChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    {loading ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      />
+                    ) : (
+                      <Save className="w-5 h-5" />
+                    )}
+                    {editingBikeId ? "Update Bike" : "Add Bike"}
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={() => {
+                      resetForm();
+                      setActiveTab("inventory");
+                    }}
+                    className="flex items-center gap-2 px-8 py-3 bg-slate-600 text-white rounded-xl font-semibold hover:bg-slate-700 transition-all duration-200"
+                  >
+                    <X className="w-5 h-5" />
+                    Cancel
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
-
-// Input Component
-const Input = ({
-  label,
-  name,
-  value,
-  onChange,
-  type = "text",
-  required = false,
-}) => (
-  <div className="space-y-2">
-    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={name}
-      name={name}
-      type={type}
-      value={value || ""}
-      onChange={onChange}
-      required={required}
-      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-    />
-  </div>
-);
-
-// Select Input Component
-const SelectInput = ({ label, name, value, onChange, required = false, children }) => (
-  <div className="space-y-2">
-    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <select
-      id={name}
-      name={name}
-      value={value || ""}
-      onChange={onChange}
-      required={required}
-      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-    >
-      {children}
-    </select>
-  </div>
-);

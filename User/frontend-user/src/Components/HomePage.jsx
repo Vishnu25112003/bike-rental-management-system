@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-import Homebg from "../assets/Bikebg.jpg"
-import SearchIcon from "../assets/searchicon.png"
-import User from "../assets/profile.png"
+import Homebg from "../assets/Bikebg.jpg";
+import SearchIcon from "../assets/searchicon.png";
+import User from "../assets/profile.png";
 
 // MenuBar Component for Navigation
 const MenuBar = ({ menuOpen, toggleMenu, menuRef, toggleBtnRef }) => {
-  const navigate = useNavigate()
-  const [showLoginModal, setShowLoginModal] = useState(false)
-  const loginModalRef = useRef()
+  const navigate = useNavigate();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const loginModalRef = useRef();
 
   // Handle click outside to close modal
   useEffect(() => {
@@ -21,24 +21,29 @@ const MenuBar = ({ menuOpen, toggleMenu, menuRef, toggleBtnRef }) => {
         loginModalRef.current &&
         !loginModalRef.current.contains(e.target)
       ) {
-        setShowLoginModal(false)
+        setShowLoginModal(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside)
-  }, [showLoginModal])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showLoginModal]);
 
   return (
     <>
       {/* Navbar */}
       <nav className="absolute top-0 left-0 w-full flex justify-between items-center p-4 md:p-6 z-20">
         <div className="flex items-center gap-0.5 sm:gap-1 p-2 rounded-md">
-          <span className="text-orange-500 text-4xl sm:text-5xl md:text-6xl font-bold leading-none">R</span>
+          <span className="text-orange-500 text-4xl sm:text-5xl md:text-6xl font-bold leading-none">
+            R
+          </span>
           <div className="flex flex-col text-white">
-            <span className="text-base sm:text-lg md:text-xl font-semibold leading-tight">ideOn</span>
-            <span className="text-base sm:text-base md:text-xl font-semibold -mt-[0.3em] leading-tight">rental</span>
+            <span className="text-base sm:text-lg md:text-xl font-semibold leading-tight">
+              ideOn
+            </span>
+            <span className="text-base sm:text-base md:text-xl font-semibold -mt-[0.3em] leading-tight">
+              rental
+            </span>
           </div>
         </div>
 
@@ -88,13 +93,15 @@ const MenuBar = ({ menuOpen, toggleMenu, menuRef, toggleBtnRef }) => {
                 className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 animate-fadeIn"
               >
                 <div className="px-4 py-3 text-center border-b">
-                  <p className="text-sm font-medium text-gray-700">You're not logged in</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    You're not logged in
+                  </p>
                 </div>
                 <div className="p-3">
                   <button
                     onClick={() => {
-                      navigate("/login")
-                      setShowLoginModal(false)
+                      navigate("/login");
+                      setShowLoginModal(false);
                     }}
                     className="w-full bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors duration-300"
                   >
@@ -107,9 +114,23 @@ const MenuBar = ({ menuOpen, toggleMenu, menuRef, toggleBtnRef }) => {
         </ul>
 
         {/* Hamburger Icon */}
-        <button ref={toggleBtnRef} className="md:hidden text-white focus:outline-none" onClick={toggleMenu}>
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <button
+          ref={toggleBtnRef}
+          className="md:hidden text-white focus:outline-none"
+          onClick={toggleMenu}
+        >
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
       </nav>
@@ -148,8 +169,8 @@ const MenuBar = ({ menuOpen, toggleMenu, menuRef, toggleBtnRef }) => {
             <li className="pt-3 mt-3 border-t border-gray-300 text-center">
               <button
                 onClick={() => {
-                  navigate("/login")
-                  setMenuOpen(false)
+                  navigate("/login");
+                  setMenuOpen(false);
                 }}
                 className="bg-orange-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-orange-600 transition-colors duration-300"
               >
@@ -160,22 +181,22 @@ const MenuBar = ({ menuOpen, toggleMenu, menuRef, toggleBtnRef }) => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
 const Homepage = () => {
-  const navigate = useNavigate()
-  const [searchValue, setSearchValue] = useState("")
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef()
-  const toggleBtnRef = useRef()
-  const [typingText, setTypingText] = useState("")
-  const words = ["Anytime !", "Anywhere !"]
-  const [wordIndex, setWordIndex] = useState(0)
-  const [charIndex, setCharIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef();
+  const toggleBtnRef = useRef();
+  const [typingText, setTypingText] = useState("");
+  const words = ["Anytime !", "Anywhere !"];
+  const [wordIndex, setWordIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const toggleMenu = () => setMenuOpen((prev) => !prev)
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -186,38 +207,38 @@ const Homepage = () => {
         toggleBtnRef.current &&
         !toggleBtnRef.current.contains(e.target)
       ) {
-        setMenuOpen(false)
+        setMenuOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("click", handleClickOutside)
-    return () => document.removeEventListener("click", handleClickOutside)
-  }, [menuOpen])
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [menuOpen]);
 
   useEffect(() => {
-    const currentWord = words[wordIndex]
-    const speed = isDeleting ? 80 : 160
+    const currentWord = words[wordIndex];
+    const speed = isDeleting ? 80 : 160;
 
     const timer = setTimeout(() => {
-      setTypingText(currentWord.substring(0, charIndex))
+      setTypingText(currentWord.substring(0, charIndex));
       if (!isDeleting && charIndex < currentWord.length) {
-        setCharIndex(charIndex + 1)
+        setCharIndex(charIndex + 1);
       } else if (isDeleting && charIndex > 0) {
-        setCharIndex(charIndex - 1)
+        setCharIndex(charIndex - 1);
       } else if (!isDeleting && charIndex === currentWord.length) {
-        setIsDeleting(true)
+        setIsDeleting(true);
       } else if (isDeleting && charIndex === 0) {
-        setIsDeleting(false)
-        setWordIndex((wordIndex + 1) % words.length)
+        setIsDeleting(false);
+        setWordIndex((wordIndex + 1) % words.length);
       }
-    }, speed)
+    }, speed);
 
-    return () => clearTimeout(timer)
-  }, [charIndex, isDeleting, wordIndex])
+    return () => clearTimeout(timer);
+  }, [charIndex, isDeleting, wordIndex]);
 
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value) // Update searchValue when the input changes
-  }
+    setSearchValue(event.target.value); // Update searchValue when the input changes
+  };
 
   return (
     <header className="relative bg-gray-100 font-[Poppins]">
@@ -232,7 +253,12 @@ const Homepage = () => {
       </div>
 
       {/* MenuBar Component */}
-      <MenuBar menuOpen={menuOpen} toggleMenu={toggleMenu} menuRef={menuRef} toggleBtnRef={toggleBtnRef} />
+      <MenuBar
+        menuOpen={menuOpen}
+        toggleMenu={toggleMenu}
+        menuRef={menuRef}
+        toggleBtnRef={toggleBtnRef}
+      />
 
       {/* Tagline */}
       <div
@@ -273,10 +299,15 @@ const Homepage = () => {
             type="text"
             placeholder="Search..."
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={handleSearchChange}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && searchValue.trim() !== "") {
-                navigate("/login")
+              if (e.key === "Enter") {
+                const trimmedValue = searchValue.trim().toLowerCase();
+                if (trimmedValue === "theni") {
+                  navigate("/login");
+                } else {
+                  alert("Location no Available!");
+                }
               }
             }}
             className="w-full pl-10 pr-4 py-2 text-gray-800 text-sm sm:text-base rounded-full border-2 border-transparent focus:border-orange-500 transition-all duration-300 placeholder-gray-500 focus:outline-none bg-white shadow-sm focus:shadow-md"
@@ -287,15 +318,21 @@ const Homepage = () => {
       {/* Optional Animation Style */}
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-4px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(-4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out forwards;
         }
       `}</style>
     </header>
-  )
-}
+  );
+};
 
-export default Homepage
+export default Homepage;

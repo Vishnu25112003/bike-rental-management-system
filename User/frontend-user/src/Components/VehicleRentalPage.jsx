@@ -1,60 +1,68 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { FaMapMarkerAlt, FaCalendarAlt, FaGasPump, FaTachometerAlt, FaCogs } from "react-icons/fa"
-import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
-import { useLocation } from "react-router-dom"
-import { motion, AnimatePresence } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import Swal from "sweetalert2"
+import { useState } from "react";
+import {
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaGasPump,
+  FaTachometerAlt,
+  FaCogs,
+} from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const VehicleRentalPage = () => {
-  const { state } = useLocation()
-  const bike = state?.bike
-  const navigate = useNavigate()
+  const { state } = useLocation();
+  const bike = state?.bike;
+  const navigate = useNavigate();
 
-  const [quantity, setQuantity] = useState(1)
-  const [pickupDate, setPickupDate] = useState(new Date())
-  const [dropoffDate, setDropoffDate] = useState(new Date(new Date().getTime() + 24 * 60 * 60 * 1000))
-  const [showPopup, setShowPopup] = useState(false)
-  const [agreeTerms, setAgreeTerms] = useState(false)
-  const [agreeLicense, setAgreeLicense] = useState(false)
-  const [showWarning, setShowWarning] = useState(false)
-  const [showTermsPopup, setShowTermsPopup] = useState(false)
-  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false)
+  const [quantity, setQuantity] = useState(1);
+  const [pickupDate, setPickupDate] = useState(new Date());
+  const [dropoffDate, setDropoffDate] = useState(
+    new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+  );
+  const [showPopup, setShowPopup] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreeLicense, setAgreeLicense] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const [showTermsPopup, setShowTermsPopup] = useState(false);
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
 
   const increaseQty = () => {
-    if (quantity < bike.quantity) setQuantity((prev) => prev + 1)
-  }
+    if (quantity < bike.quantity) setQuantity((prev) => prev + 1);
+  };
 
-  const decreaseQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
+  const decreaseQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   const handlePickupDateChange = (date) => {
-    setPickupDate(date)
-    const nextDay = new Date(date.getTime() + 24 * 60 * 60 * 1000)
-    setDropoffDate(nextDay)
-  }
+    setPickupDate(date);
+    const nextDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+    setDropoffDate(nextDay);
+  };
 
   // Calculate total amount (rental + deposit)
   const calculateTotalAmount = () => {
-    const rentalAmount = bike.price * quantity
-    const depositAmount = bike.deposit || 2000
+    const rentalAmount = bike.price * quantity;
+    const depositAmount = bike.deposit || 2000;
     return {
       rental: rentalAmount,
       deposit: depositAmount,
       total: rentalAmount + depositAmount,
-    }
-  }
+    };
+  };
 
   const handleBuyClick = () => {
     if (!agreeTerms || !agreeLicense) {
-      setShowWarning(true)
-      return
+      setShowWarning(true);
+      return;
     }
 
     // Show confirmation popup with total amount
-    const amounts = calculateTotalAmount()
+    const amounts = calculateTotalAmount();
     Swal.fire({
       title: "Booking Confirmation",
       html: `
@@ -88,12 +96,13 @@ const VehicleRentalPage = () => {
               quantity: quantity,
             },
           },
-        })
+        });
       }
-    })
-  }
+    });
+  };
 
-  if (!bike) return <div className="text-center py-10">Bike data not found!</div>
+  if (!bike)
+    return <div className="text-center py-10">Bike data not found!</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 font-roboto pt-24">
@@ -103,16 +112,26 @@ const VehicleRentalPage = () => {
             {/* Left Section */}
             <div className="md:w-2/3">
               <div className="w-full">
-                <img src={bike.img || "/placeholder.svg"} alt={bike.name} className="w-full h-96 object-cover" />
+                <img
+                  src={bike.img || "/placeholder.svg"}
+                  alt={bike.name}
+                  className="w-full h-96 object-cover"
+                />
               </div>
               <div className="p-6">
-                <h1 className="text-4xl font-bold text-orange-500">{bike.name}</h1>
+                <h1 className="text-4xl font-bold text-orange-500">
+                  {bike.name}
+                </h1>
                 <div className="space-y-2 mt-2">
                   <p>
-                    Rent Amount: <span className="font-semibold">₹{bike.price}</span>
+                    Rent Amount:{" "}
+                    <span className="font-semibold">₹{bike.price}</span>
                   </p>
                   <p>
-                    Refundable Deposit: <span className="font-semibold">₹{bike.deposit || 2000}</span>
+                    Refundable Deposit:{" "}
+                    <span className="font-semibold">
+                      ₹{bike.deposit || 2000}
+                    </span>
                   </p>
                   <div className="text-gray-600 space-y-1">
                     <div className="flex items-center">
@@ -126,11 +145,19 @@ const VehicleRentalPage = () => {
 
                   {/* Quantity Selector */}
                   <div className="flex items-center mt-4">
-                    <button onClick={decreaseQty} className="border border-gray-300 rounded-l px-3 py-1 bg-gray-100">
+                    <button
+                      onClick={decreaseQty}
+                      className="border border-gray-300 rounded-l px-3 py-1 bg-gray-100"
+                    >
                       -
                     </button>
-                    <div className="border-t border-b border-gray-300 px-4 py-1">{quantity}</div>
-                    <button onClick={increaseQty} className="border border-gray-300 rounded-r px-3 py-1 bg-gray-100">
+                    <div className="border-t border-b border-gray-300 px-4 py-1">
+                      {quantity}
+                    </div>
+                    <button
+                      onClick={increaseQty}
+                      className="border border-gray-300 rounded-r px-3 py-1 bg-gray-100"
+                    >
                       +
                     </button>
                   </div>
@@ -179,9 +206,6 @@ const VehicleRentalPage = () => {
                     >
                       Terms
                     </button>
-                    <button className="border border-gray-300 rounded px-4 py-2 text-sm hover:bg-gray-50">
-                      View location on map
-                    </button>
                   </div>
                 </div>
               </div>
@@ -227,7 +251,10 @@ const VehicleRentalPage = () => {
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
                   />
-                  <span>Confirm that you are above 18 and agree to all Terms & Conditions</span>
+                  <span>
+                    Confirm that you are above 18 and agree to all Terms &
+                    Conditions
+                  </span>
                 </label>
                 <label className="flex items-start">
                   <input
@@ -236,7 +263,10 @@ const VehicleRentalPage = () => {
                     checked={agreeLicense}
                     onChange={(e) => setAgreeLicense(e.target.checked)}
                   />
-                  <span>Submit original Driving License at pickup; it will be returned at drop-off.</span>
+                  <span>
+                    Submit original Driving License at pickup; it will be
+                    returned at drop-off.
+                  </span>
                 </label>
                 <button
                   onClick={handleBuyClick}
@@ -270,7 +300,9 @@ const VehicleRentalPage = () => {
               className="bg-white p-6 rounded-lg text-center max-w-sm mx-auto"
             >
               <h2 className="text-xl font-bold text-red-500 mb-4">Warning</h2>
-              <p className="text-gray-600 mb-4">Please agree to the terms and license before proceeding!</p>
+              <p className="text-gray-600 mb-4">
+                Please agree to the terms and license before proceeding!
+              </p>
               <button
                 onClick={() => setShowWarning(false)}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full font-semibold"
@@ -291,16 +323,24 @@ const VehicleRentalPage = () => {
             transition={{ duration: 0.3 }}
             className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-2xl"
           >
-            <img src={bike.img || "/placeholder.svg"} alt={bike.name} className="w-full h-64 object-cover" />
+            <img
+              src={bike.img || "/placeholder.svg"}
+              alt={bike.name}
+              className="w-full h-64 object-cover"
+            />
             <div className="p-6">
-              <h2 className="text-3xl font-extrabold text-center text-orange-500 mb-6">{bike.name}</h2>
+              <h2 className="text-3xl font-extrabold text-center text-orange-500 mb-6">
+                {bike.name}
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-gray-700 text-md">
                 <div>
                   <p className="flex items-center gap-2">
-                    <FaCalendarAlt className="text-orange-500" /> Model Year: {bike.modelYear}
+                    <FaCalendarAlt className="text-orange-500" /> Model Year:{" "}
+                    {bike.modelYear}
                   </p>
                   <p className="flex items-center gap-2">
-                    <FaTachometerAlt className="text-orange-500" /> Mileage: {bike.mileage}
+                    <FaTachometerAlt className="text-orange-500" /> Mileage:{" "}
+                    {bike.mileage}
                   </p>
                   <p className="flex items-center gap-2">
                     <FaCogs className="text-orange-500" /> Engine: {bike.cc} CC
@@ -346,19 +386,41 @@ const VehicleRentalPage = () => {
             transition={{ duration: 0.3 }}
             className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6 overflow-y-auto max-h-[90vh]"
           >
-            <h2 className="text-2xl font-bold text-orange-500 text-center mb-4">Terms & Conditions – {bike.name}</h2>
+            <h2 className="text-2xl font-bold text-orange-500 text-center mb-4">
+              Terms & Conditions – {bike.name}
+            </h2>
             <ul className="text-gray-700 text-sm list-disc pl-5 space-y-2">
-              <li>The renter must be above 18 years of age with a valid driving license.</li>
-              <li>A refundable deposit of ₹{bike.deposit || 2000} is required at pickup.</li>
               <li>
-                Extra charges: {bike.extraCharge || "₹5/km"} beyond {bike.kmLimit || "250 km"} per day limit.
+                The renter must be above 18 years of age with a valid driving
+                license.
               </li>
-              <li>Fuel is not included. Bike must be returned with the same fuel level.</li>
-              <li>Any damage to the vehicle will be charged as per the vendor's discretion.</li>
-              <li>Pickup and drop-off should be at the same location: {bike.vendorName || "N/A"}.</li>
-              <li>Rental period: From the selected pickup to drop-off date only.</li>
+              <li>
+                A refundable deposit of ₹{bike.deposit || 2000} is required at
+                pickup.
+              </li>
+              <li>
+                Extra charges: {bike.extraCharge || "₹5/km"} beyond{" "}
+                {bike.kmLimit || "250 km"} per day limit.
+              </li>
+              <li>
+                Fuel is not included. Bike must be returned with the same fuel
+                level.
+              </li>
+              <li>
+                Any damage to the vehicle will be charged as per the vendor's
+                discretion.
+              </li>
+              <li>
+                Pickup and drop-off should be at the same location:{" "}
+                {bike.vendorName || "N/A"}.
+              </li>
+              <li>
+                Rental period: From the selected pickup to drop-off date only.
+              </li>
               <li>No refunds for early return or unused hours.</li>
-              <li>All bookings are subject to availability and confirmation.</li>
+              <li>
+                All bookings are subject to availability and confirmation.
+              </li>
             </ul>
             <div className="text-center mt-6">
               <button
@@ -372,7 +434,7 @@ const VehicleRentalPage = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default VehicleRentalPage
+export default VehicleRentalPage;

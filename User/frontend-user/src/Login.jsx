@@ -39,7 +39,7 @@ function LoginPage() {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          navigate("/dashboard");
+          navigate("/results");
         });
       }
     } catch (error) {
@@ -63,7 +63,10 @@ function LoginPage() {
         <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
-            <label className="block text-lg font-semibold mb-2" htmlFor="mobile">
+            <label
+              className="block text-lg font-semibold mb-2"
+              htmlFor="mobile"
+            >
               Mobile Number
             </label>
             <input
@@ -78,7 +81,10 @@ function LoginPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-lg font-semibold mb-2" htmlFor="password">
+            <label
+              className="block text-lg font-semibold mb-2"
+              htmlFor="password"
+            >
               Password
             </label>
             <div className="relative">
@@ -109,16 +115,6 @@ function LoginPage() {
             </button>
           </div>
         </form>
-
-        <div className="text-center mb-4">
-          <span className="text-lg font-semibold">(OR)</span>
-        </div>
-
-        <button className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-300 shadow-md hover:shadow-lg">
-          <img alt="Google logo" className="mr-3 h-5 w-5" src={google} />
-          <span>Continue with Google</span>
-        </button>
-
         <div className="text-center mt-4">
           <span className="text-sm text-gray-700">
             Don’t have an account?{" "}
